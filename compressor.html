@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BitTool Universal File Compressor</title>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Segoe UI,Arial,sans-serif;
+  background:linear-gradient(135deg,#0b1220,#12243d);
+  color:#fff;
+  min-height:100vh;
+}
+.container{max-width:950px;margin:25px auto;padding:20px}
+.card{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(15px);
+  border-radius:22px;
+  padding:25px;
+  box-shadow:0 12px 35px rgba(0,0,0,.18);
+}
+h1{margin:0 0 8px;font-size:30px}
+.sub{margin:0 0 25px;color:#cbd5e1}
+.upload{
+  border:2px dashed rgba(55,229,141,.55);
+  border-radius:20px;padding:35px 20px;
+  text-align:center;
+  background:rgba(255,255,255,.04);
+  cursor:pointer;
+  transition:.2s;
+}
+.upload:hover{background:rgba(55,229,141,.08)}
+.upload strong{display:block;font-size:19px;margin-bottom:8px}
+#files{display:none}
+.settings{
+  display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;
+}
+.setting{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  padding:15px;border-radius:15px;
+}
+label{display:block;font-weight:700;margin-bottom:8px}
+select,button,input{
+  width:100%;padding:12px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.15);
+  font-size:15px;
+  background:#101d33;
+  color:#fff;
+}
+button{
+  border:0;background:#37e58d;color:#062014;
+  font-weight:700;cursor:pointer;
+  transition:.2s;
+}
+button:hover{opacity:.9;transform:translateY(-1px)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+#clearBtn{background:#2563eb;color:#fff}
+.progress-wrap{margin-top:22px;display:none}
+.progress{
+  height:12px;background:rgba(255,255,255,.12);
+  border-radius:99px;overflow:hidden;
+}
+.bar{height:100%;width:0%;background:linear-gradient(90deg,#24d366,#00b4d8);transition:width .2s}
+.status{margin-top:9px;font-size:14px;color:#cbd5e1}
+.summary{
+  margin-top:20px;padding:16px;border-radius:15px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  display:none;
+}
+.result-list{margin-top:18px}
+.result{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;padding:14px;border:1px solid #e1e6ef;border-radius:14px;
+  margin-top:10px;background:#fff;
+}
+.result .name{font-weight:700;word-break:break-all}
+.result small{color:#cbd5e1}
+.download{
+  width:auto;padding:9px 13px;white-space:nowrap;
+  background:#37e58d;text-decoration:none;color:#062014;
+  border-radius:10px;font-weight:700;
+}
+.note{
+  margin-top:18px;font-size:13px;line-height:1.55;color:#9fb5cb;
+}
+@media(max-width:650px){
+  .container{margin:10px auto;padding:12px}
+  .card{padding:20px;border-radius:18px}
+  .settings,.actions{grid-template-columns:1fr}
+  h1{font-size:25px}
+  .result{align-items:flex-start;flex-direction:column}
+  .download{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:0 4px">
+    <div style="font-size:30px;font-weight:700;color:#37e58d">BitTool</div>
+    <div style="font-size:13px;color:#9fb5cb">Universal Compressor</div>
+  </div>
+  <div class="card">
+    <h1>BitTool Universal File Compressor</h1>
+    <p class="sub">Compress almost any file type into a ZIP — PDF, DOCX, APK, TXT, CSV, images, videos, and more.</p>
+
+    <label class="upload" for="files">
+      <strong>📁 Choose Files</strong>
+      <span id="pickText">Select one or many files from your device</span>
+    </label>
+    <input id="files" type="file" multiple>
+
+    <div class="settings">
+      <div class="setting">
+        <label for="level">Compression Level</label>
+        <select id="level">
+          <option value="1">1 — Fastest</option>
+          <option value="3">3 — Fast</option>
+          <option value="6" selected>6 — Balanced</option>
+          <option value="9">9 — Maximum</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label for="name">ZIP File Name</label>
+        <input id="name" value="BitTool_Compressed">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="compressBtn" disabled>Compress Files</button>
+      <button id="clearBtn">Clear</button>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="status" id="status">Preparing...</div>
+    </div>
+
+    <div class="summary" id="summary"></div>
+    <div class="result-list" id="results"></div>
+
+    <div class="note">
+      Important: no compressor can guarantee that every file becomes smaller.
+      JPG, PNG, MP4, PDF, ZIP, RAR and similar files are often already compressed,
+      so their ZIP may be the same size or slightly larger. This tool still accepts
+      them and safely packages them into a standard ZIP file.
+    </div>
+  </div>
+</div>
+
+<script>
+const fileInput = document.getElementById('files');
+const compressBtn = document.getElementById('compressBtn');
+const clearBtn = document.getElementById('clearBtn');
+const pickText = document.getElementById('pickText');
+const levelSelect = document.getElementById('level');
+const nameInput = document.getElementById('name');
+const progressWrap = document.getElementById('progressWrap');
+const bar = document.getElementById('bar');
+const status = document.getElementById('status');
+const summary = document.getElementById('summary');
+const results = document.getElementById('results');
+
+let selectedFiles = [];
+let downloadUrls = [];
+
+function formatBytes(bytes){
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  const units=['B','KB','MB','GB','TB'];
+  const i=Math.min(Math.floor(Math.log(bytes)/Math.log(1024)), units.length-1);
+  return (bytes/Math.pow(1024,i)).toFixed(i===0?0:2)+' '+units[i];
+}
+
+fileInput.addEventListener('change', () => {
+  selectedFiles = Array.from(fileInput.files || []);
+  pickText.textContent = selectedFiles.length
+    ? `${selectedFiles.length} file${selectedFiles.length>1?'s':''} selected`
+    : 'Select one or many files from your device';
+  compressBtn.disabled = selectedFiles.length === 0;
+  summary.style.display='none';
+  results.innerHTML='';
+  revokeUrls();
+});
+
+clearBtn.addEventListener('click', () => {
+  selectedFiles=[];
+  fileInput.value='';
+  pickText.textContent='Select one or many files from your device';
+  compressBtn.disabled=true;
+  summary.style.display='none';
+  results.innerHTML='';
+  progressWrap.style.display='none';
+  bar.style.width='0%';
+  revokeUrls();
+});
+
+function revokeUrls(){
+  downloadUrls.forEach(u=>URL.revokeObjectURL(u));
+  downloadUrls=[];
+}
+
+compressBtn.addEventListener('click', async () => {
+  if(!selectedFiles.length) return;
+  if(typeof JSZip === 'undefined'){
+    alert('ZIP library could not load. Please check your internet connection and try again.');
+    return;
+  }
+
+  compressBtn.disabled=true;
+  clearBtn.disabled=true;
+  progressWrap.style.display='block';
+  summary.style.display='none';
+  results.innerHTML='';
+  bar.style.width='0%';
+
+  const zip = new JSZip();
+  const level = Number(levelSelect.value);
+  let originalTotal = 0;
+
+  try{
+    for(let i=0;i<selectedFiles.length;i++){
+      const file=selectedFiles[i];
+      originalTotal += file.size;
+
+      status.textContent = `Adding ${i+1}/${selectedFiles.length}: ${file.name}`;
+      zip.file(file.name, file, {
+        binary:true,
+        compression:'DEFLATE',
+        compressionOptions:{level}
+      });
+
+      bar.style.width = Math.round(((i+1)/selectedFiles.length)*55) + '%';
+      await new Promise(r=>setTimeout(r,0));
+    }
+
+    status.textContent='Building compressed ZIP...';
+
+    const blob = await zip.generateAsync({
+      type:'blob',
+      compression:'DEFLATE',
+      compressionOptions:{level},
+      streamFiles:true
+    }, metadata => {
+      bar.style.width = (55 + Math.round(metadata.percent * 0.45)) + '%';
+      status.textContent = `Compressing ZIP... ${Math.round(metadata.percent)}%`;
+    });
+
+    const zipSize = blob.size;
+    const saved = originalTotal - zipSize;
+    const percent = originalTotal
+      ? ((saved / originalTotal) * 100)
+      : 0;
+
+    bar.style.width='100%';
+    status.textContent='Compression complete.';
+
+    const sizeText = saved > 0
+      ? `Saved ${formatBytes(saved)} (${percent.toFixed(1)}%)`
+      : `ZIP is ${formatBytes(Math.abs(saved))} larger (${Math.abs(percent).toFixed(1)}%)`;
+
+    summary.innerHTML = `
+      <b>Done ✅</b><br>
+      Original: ${formatBytes(originalTotal)}<br>
+      ZIP: ${formatBytes(zipSize)}<br>
+      ${sizeText}
+    `;
+    summary.style.display='block';
+
+    const url = URL.createObjectURL(blob);
+    downloadUrls.push(url);
+
+    const safeName = (nameInput.value.trim() || 'BitTool_Compressed')
+      .replace(/[<>:"/\\\\|?*]+/g,'_');
+
+    const row=document.createElement('div');
+    row.className='result';
+    row.innerHTML=`
+      <div>
+        <div class="name">${safeName}.zip</div>
+        <small>${formatBytes(zipSize)} • ${selectedFiles.length} file${selectedFiles.length>1?'s':''}</small>
+      </div>
+      <a class="download" href="${url}" download="${safeName}.zip">Download ZIP</a>
+    `;
+    results.appendChild(row);
+
+  }catch(err){
+    console.error(err);
+    status.textContent='Compression failed.';
+    summary.innerHTML=`<b>❌ Compression failed</b><br>${String(err.message || err)}`;
+    summary.style.display='block';
+  }finally{
+    compressBtn.disabled = selectedFiles.length === 0;
+    clearBtn.disabled=false;
+  }
+});
+</script>
+</body>
+</html>

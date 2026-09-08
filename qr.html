@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BitTool Premium QR Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
+
+
+body{
+
+min-height:100vh;
+
+background:linear-gradient(135deg,#061426,#0b4168,#008f70);
+
+color:white;
+
+}
+
+
+header{
+position:relative;
+z-index:99999;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 30px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(20px);
+}
+
+
+.logo{
+
+font-size:32px;
+
+font-weight:700;
+
+}
+
+
+.logo span{
+
+color:#00ff95;
+
+}
+
+
+.profile{
+
+height:50px;
+
+width:50px;
+
+border-radius:50%;
+
+background:#00ff95;
+
+color:black;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:22px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+
+.card{
+
+width:94%;
+
+max-width:750px;
+
+margin:35px auto;
+
+padding:30px;
+
+border-radius:25px;
+
+background:rgba(255,255,255,.1);
+
+backdrop-filter:blur(20px);
+
+box-shadow:0 0 30px rgba(0,255,150,.2);
+
+}
+
+
+h1{
+
+text-align:center;
+
+margin-bottom:25px;
+
+}
+
+
+label{
+
+display:block;
+
+margin-top:18px;
+
+font-weight:600;
+
+}
+
+
+input[type="text"]{
+
+width:100%;
+
+padding:15px;
+
+border-radius:15px;
+
+border:none;
+
+outline:none;
+
+font-size:16px;
+
+margin-top:8px;
+
+}
+
+
+input[type="color"]{
+
+width:100%;
+
+height:50px;
+
+border:none;
+
+border-radius:15px;
+
+margin-top:8px;
+
+cursor:pointer;
+
+}
+
+
+select{
+
+width:100%;
+
+padding:14px;
+
+border:none;
+
+border-radius:15px;
+
+margin-top:8px;
+
+}
+
+
+button{
+
+width:100%;
+
+padding:16px;
+
+margin-top:20px;
+
+border:none;
+
+border-radius:15px;
+
+background:linear-gradient(90deg,#00ff95,#00cfff);
+
+font-size:17px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+
+button:hover{
+
+transform:translateY(-2px);
+
+}
+
+
+#qr{
+
+margin-top:30px;
+
+display:flex;
+
+justify-content:center;
+
+background:white;
+
+padding:20px;
+
+border-radius:20px;
+
+}
+
+
+.footer{
+
+text-align:center;
+
+margin-top:25px;
+
+opacity:.8;
+
+}
+
+
+.profile-wrap{position:relative;z-index:100000}
+.profile{position:relative;z-index:100001}
+.profile{
+  user-select:none;
+}
+.profile-popup{
+  display:none;
+  position:absolute;
+  right:0;
+  top:58px;
+  width:270px;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(8,20,35,.97);
+  border:1px solid rgba(0,255,149,.25);
+  box-shadow:0 18px 45px rgba(0,0,0,.35);
+  z-index:1000;
+}
+.profile-popup.show{display:block}
+@media(max-width:520px){
+  .profile-popup{right:-8px;width:min(270px,calc(100vw - 30px))}
+}
+.profile-popup .p-name{font-size:18px;font-weight:700;margin-bottom:5px}
+.profile-popup .p-email{font-size:13px;color:#b9d4d0;word-break:break-word}
+.profile-popup .p-action{
+  margin-top:14px;padding:10px 12px;border-radius:12px;
+  background:rgba(0,255,149,.12);color:#00ff95;font-size:13px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="logo">
+Bit<span>Tool</span>
+</div>
+
+
+<div class="profile-wrap">
+  <div class="profile" id="profileBtn" aria-label="Profile" role="button" tabindex="0">N</div>
+  <div class="profile-popup" id="profilePopup">
+    <div class="p-name" id="profileName">Your Name</div>
+    <div class="p-email" id="profileEmail">Please Sign Up</div>
+    <div class="p-action">BitTool Profile</div>
+  </div>
+</div>
+
+
+</header>
+
+
+
+<div class="card">
+
+
+<h1>
+Premium QR Generator
+</h1>
+
+
+
+<label>
+Enter Link
+</label>
+
+
+<input 
+type="text"
+id="url"
+placeholder="https://example.com"
+>
+
+
+
+<label>
+QR Color
+</label>
+
+
+<input 
+type="color"
+id="qrColor"
+value="#000000"
+>
+
+
+
+<label>
+Background Color
+</label>
+
+
+<input 
+type="color"
+id="bgColor"
+value="#ffffff"
+>
+
+
+
+<label>
+QR Style
+</label>
+
+
+<select id="style">
+
+<option value="square">
+Square
+</option>
+
+<option value="rounded">
+Rounded
+</option>
+
+<option value="dots">
+Dots
+</option>
+
+</select>
+
+
+
+<button onclick="generateQR()">
+
+Generate QR
+
+</button>
+
+
+<div id="qr"></div>
+
+
+<button onclick="downloadQR()">
+
+Download PNG
+
+</button>
+
+
+
+<div class="footer">
+
+Made with ❤️ BitTool
+
+</div>
+
+
+</div>
+<script>
+let qrCode = null;
+
+function generateQR(){
+  const url = document.getElementById('url').value.trim();
+  const qrBox = document.getElementById('qr');
+  const qrColor = document.getElementById('qrColor').value;
+  const bgColor = document.getElementById('bgColor').value;
+  const style = document.getElementById('style').value;
+
+  if(!url){
+    alert('Please enter a link first.');
+    return;
+  }
+
+  qrBox.innerHTML = '';
+
+  if(typeof QRCodeStyling === 'undefined'){
+    alert('QR library could not be loaded. Please check your internet connection and try again.');
+    return;
+  }
+
+  qrCode = new QRCodeStyling({
+    width: 320,
+    height: 320,
+    type: 'canvas',
+    data: url,
+    margin: 10,
+    qrOptions: { errorCorrectionLevel: 'H' },
+    dotsOptions: {
+      color: qrColor,
+      type: style === 'rounded' ? 'rounded' : style === 'dots' ? 'dots' : 'square'
+    },
+    backgroundOptions: { color: bgColor },
+    cornersSquareOptions: { color: qrColor },
+    cornersDotOptions: { color: qrColor }
+  });
+
+  qrCode.append(qrBox);
+}
+
+function downloadQR(){
+  if(!qrCode){
+    alert('Generate QR first.');
+    return;
+  }
+
+  qrCode.download({
+    name: 'BitTool_QR',
+    extension: 'png'
+  }).catch(function(){
+    alert('Download failed. Please generate the QR again and retry.');
+  });
+}
+
+window.addEventListener('load', function(){
+  const urlInput = document.getElementById('url');
+  urlInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') generateQR();
+  });
+});
+
+// BitTool profile: reads the same signup values used by the other tools.
+function getProfileValue(keys, fallback){
+  for(const key of keys){
+    const value = localStorage.getItem(key);
+    if(value && value.trim()) return value.trim();
+  }
+  return fallback;
+}
+function refreshProfile(){
+  const first = getProfileValue(['bittool_first','firstName','first_name'],'');
+  const last = getProfileValue(['bittool_last','lastName','last_name'],'');
+  const email = getProfileValue(['bittool_email','email','userEmail'],'');
+  const fullName = (first + ' ' + last).trim() || 'Your Name';
+  const initial = first ? first.charAt(0).toUpperCase() : 'N';
+  document.getElementById('profileBtn').textContent = initial;
+  document.getElementById('profileName').textContent = fullName;
+  document.getElementById('profileEmail').textContent = email || 'Please Sign Up';
+}
+function toggleProfile(){
+  document.getElementById('profilePopup').classList.toggle('show');
+}
+
+function readSignupProfile(){
+  const first=(localStorage.getItem('bittool_first')||'').trim();
+  const last=(localStorage.getItem('bittool_last')||'').trim();
+  const email=(localStorage.getItem('bittool_email')||'').trim();
+  const fullName=(first+' '+last).trim() || 'Your Name';
+  document.getElementById('profileBtn').textContent =
+    first ? first.charAt(0).toUpperCase() : 'N';
+  document.getElementById('profileName').textContent=fullName;
+  document.getElementById('profileEmail').textContent=email || 'Please Sign Up';
+}
+window.addEventListener('storage',readSignupProfile);
+
+window.addEventListener('DOMContentLoaded', function(){
+  refreshProfile();
+  const btn = document.getElementById('profileBtn');
+  btn.addEventListener('click', function(e){ e.stopPropagation(); toggleProfile(); });
+  btn.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleProfile(); }
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.profile-wrap')){
+      document.getElementById('profilePopup').classList.remove('show');
+    }
+  });
+});
+
+</script>
+
+</body>
+</html>
